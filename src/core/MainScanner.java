@@ -114,7 +114,7 @@ public class MainScanner {
 				if (buffer.length() > 1) {
 					LOGGER.log(Level.INFO, "emailing the results..");
 					System.out.println(buffer.toString());
-					//sendEmailNotif(buffer.toString());
+					// sendEmailNotif(buffer.toString());
 					LOGGER.log(Level.INFO, "email sent.");
 				}
 			}
@@ -125,6 +125,69 @@ public class MainScanner {
 				breitHandle.cancel(true);
 			}
 		}, 10, TimeUnit.DAYS);
+	}
+
+	public void runSingleDayChecker(String targetDate) {
+		final Runnable checker = new Runnable() {
+			public void run() {
+				LOGGER.log(Level.INFO, "loading the content..");
+				String webPage = "https://guestui.breitenbush.com/";
+				String html = "";
+				try {
+					html = Jsoup.connect(webPage).get().html();
+				} catch (IOException e) {
+					LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				}
+				LOGGER.log(Level.INFO, "loading done.");
+				Document doc = Jsoup.parse(html);
+				Elements tableRows = doc.getElementsByTag("tbody").first().getElementsByTag("tr");
+				int dayPointer = 0;
+				StringBuilder buffer = new StringBuilder();
+				while (dayPointer++ < 60) {
+					Element tr = tableRows.get(dayPointer++);
+					Elements tableData = tr.getElementsByTag("td");
+					String day = tableData.get(0).text();
+					String date = tableData.get(1).text();
+					if (date.contains("W")) {
+						continue;
+					}
+					if (date.equals(targetDate)) {
+						LOGGER.log(Level.INFO, "Found target date");
+						tr = tableRows.get(dayPointer++);
+						tr = tableRows.get(dayPointer);
+						boolean fancyCabin = tableData.get(2).attr("class").contains(" available");
+						boolean sharedFancyCabin = tableData.get(2).attr("class").contains(" shared");
+						boolean cabin = tableData.get(3).attr("class").contains(" available");
+						boolean shared = tableData.get(3).attr("class").contains(" shared");
+						boolean lodge = tableData.get(4).attr("class").contains(" available");
+						if (fancyCabin || sharedFancyCabin) {
+							buffer.append(date + " " + day + " some fancy cabin is available\n");
+						}
+						if (cabin && !shared) {
+							buffer.append(date + " " + day + " cabin is available\n");
+						}
+						if (cabin && shared) {
+							buffer.append(date + " " + day + " shared cabin is available\n");
+						}
+						if (lodge) {
+							buffer.append(date + " " + day + " lodge room is available\n");
+						}
+					}
+				}
+				if (buffer.length() > 1) {
+					LOGGER.log(Level.INFO, "emailing the results..");
+					System.out.println(buffer.toString());
+					sendEmailNotif(buffer.toString());
+					LOGGER.log(Level.INFO, "email sent.");
+				}
+			}
+		};
+		final ScheduledFuture<?> breitHandle = scheduler.scheduleAtFixedRate(checker, 0, 2, TimeUnit.HOURS);
+		scheduler.schedule(new Runnable() {
+			public void run() {
+				breitHandle.cancel(true);
+			}
+		}, 24, TimeUnit.HOURS);
 	}
 
 	public void sendEmailNotif(String text) {
@@ -158,7 +221,8 @@ public class MainScanner {
 	public static void main(String[] args) throws Exception {
 		MainScanner ms = new MainScanner(args[0].replace("\"", ""), args[1].replace("\"", ""),
 				args[2].replace("\"", ""), args[3].replace("\"", ""));
-		ms.runTheChecker();
+		// ms.runTheChecker();
+		ms.runSingleDayChecker("1-19-19");
 	}
 
 }
