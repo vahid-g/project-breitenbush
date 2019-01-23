@@ -223,7 +223,7 @@ public class MainScanner {
 				if (buffer.length() > 1) {
 					LOGGER.log(Level.INFO, "emailing the results..");
 					System.out.println(buffer.toString());
-					// sendEmailNotif(buffer.toString());
+					sendEmailNotif(buffer.toString());
 					LOGGER.log(Level.INFO, "email sent.");
 				}
 			}
