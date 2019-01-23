@@ -189,7 +189,7 @@ public class MainScanner {
 			}
 		}, 24, TimeUnit.HOURS);
 	}
-	
+
 	public void runLodgeRoomChecker() {
 		final Runnable checker = new Runnable() {
 			public void run() {
@@ -207,35 +207,16 @@ public class MainScanner {
 				int dayPointer = 0;
 				StringBuilder buffer = new StringBuilder();
 				while (dayPointer++ < 60) {
-					Element tr = tableRows.get(dayPointer++);
+					Element tr = tableRows.get(dayPointer);
 					Elements tableData = tr.getElementsByTag("td");
 					String day = tableData.get(0).text();
 					String date = tableData.get(1).text();
 					if (date.contains("W")) {
 						continue;
 					}
-					if (day.equals("Fri")) {
-						tr = tableRows.get(dayPointer++);
-						Elements satData = tr.getElementsByTag("td");
-						tr = tableRows.get(dayPointer);
-						Elements sunData = tr.getElementsByTag("td");
-						boolean friLodge = tableData.get(4).attr("class").contains(" available");
-						boolean satLodge = tableData.get(4).attr("class").contains(" available");
-						boolean sunCabin = sunData.get(3).attr("class").contains(" available");
-						boolean sunShared = sunData.get(3).attr("class").contains(" shared");
-						boolean sunLodge = tableData.get(4).attr("class").contains(" available");
-						// lodge room
-						if (friLodge && !satLodge) {
+					if (day.equals("Fri") || day.equals("Sat") || day.equals("Sun")) {
+						if (tableData.get(4).attr("class").contains(" available")) {
 							buffer.append(date + " " + day + " lodge room is available\n");
-						}
-						if (friLodge && satLodge) {
-							buffer.append(date + " Fri-Sat lodge room is available\n");
-						}
-						if (satLodge && !sunLodge) {
-							buffer.append(date + " Sat lodge room is available\n");
-						}
-						if (!satLodge && !sunLodge) {
-							buffer.append(date + " Sun lodge room is available\n");
 						}
 					}
 				}
@@ -287,7 +268,7 @@ public class MainScanner {
 		MainScanner ms = new MainScanner(args[0].replace("\"", ""), args[1].replace("\"", ""),
 				args[2].replace("\"", ""), args[3].replace("\"", ""));
 		// ms.runTheChecker();
-		//ms.runSingleDayChecker("1-19-19");
+		// ms.runSingleDayChecker("1-19-19");
 		ms.runLodgeRoomChecker();
 	}
 
