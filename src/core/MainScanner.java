@@ -228,7 +228,7 @@ public class MainScanner {
 				}
 			}
 		};
-		final ScheduledFuture<?> breitHandle = scheduler.scheduleAtFixedRate(checker, 0, 12, TimeUnit.HOURS);
+		final ScheduledFuture<?> breitHandle = scheduler.scheduleAtFixedRate(checker, 0, 4, TimeUnit.HOURS);
 		scheduler.schedule(new Runnable() {
 			public void run() {
 				breitHandle.cancel(true);
