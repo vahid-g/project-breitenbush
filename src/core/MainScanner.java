@@ -2,6 +2,7 @@ package core;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -265,8 +266,13 @@ public class MainScanner {
 	}
 
 	public static void main(String[] args) throws Exception {
-		MainScanner ms = new MainScanner(args[0].replace("\"", ""), args[1].replace("\"", ""),
-				args[2].replace("\"", ""), args[3].replace("\"", ""));
+		String pass = "";
+		try (Scanner sc = new Scanner(System.in)) {
+			System.out.println("Please enter your password:");
+			pass = sc.nextLine();
+		}
+		MainScanner ms = new MainScanner(args[0].replace("\"", ""), pass, args[1].replace("\"", ""),
+				args[2].replace("\"", ""));
 		// ms.runTheChecker();
 		// ms.runSingleDayChecker("1-19-19");
 		ms.runLodgeRoomChecker();
