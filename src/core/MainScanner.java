@@ -212,10 +212,7 @@ public class MainScanner {
 					Elements tableData = tr.getElementsByTag("td");
 					String day = tableData.get(0).text();
 					String date = tableData.get(1).text();
-					if (date.contains("W")) {
-						continue;
-					}
-					if (day.equals("Fri") || day.equals("Sat") || day.equals("Sun")) {
+					if (day.equals("Thu") || day.equals("Fri") || day.equals("Sat") || day.equals("Sun")) {
 						if (tableData.get(4).attr("class").contains(" available")) {
 							buffer.append(date + " " + day + " lodge room is available\n");
 						}
